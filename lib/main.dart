@@ -32,8 +32,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const MyHomePage(title: 'status',),
-    const ActionPage(title: 'actions'),
+    const MyHomePage(title: 'Server Status',),
+    const ActionPage(title: 'Commands'),
   ];
 
   void _onItemTapped(int index) {

@@ -28,6 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
+          backgroundColor: Colors.deepPurple,
           content: Stack(
             clipBehavior: Clip.none,
             children: <Widget>[
@@ -49,11 +50,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
+                    const Padding(
+                        padding: EdgeInsets.all(8),
+                    child: Text("Add a server")),
 
                     Padding(
                       padding: const EdgeInsets.all(8),
                       child: TextFormField(
-                        decoration: const InputDecoration.collapsed(hintText: "Server Address"),
+
+                        textAlignVertical: TextAlignVertical.center,
+
+                        decoration: InputDecoration(
+                          labelText: "Server Address",
+                          labelStyle: TextStyle(color: Colors.grey, backgroundColor: Colors.black),
+                          filled: true,
+                            fillColor: Colors.black,
+
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+
+                          ),),
                       validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "ERROR";

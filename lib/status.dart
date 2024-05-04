@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'actions.dart';
+import 'commands.dart';
+import 'classes.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -14,9 +15,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> pages = [const MyHomePage(title: "Status"), const ActionPage(title: "Actions")];
 
-  List<List<String>> servers = [
-    ["xxx.xxx.x.xx", "Online"],
-    ["yyy.yyy.y.yy", "Offline"]
+  List<Server> servers = [
+    Server("xxx.xxx.x.xx"),
+    Server("yyy.yyy.y.yy")
   ];
 
   void nothing() {}
@@ -31,13 +32,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Widget> rowBuilder() {
     List<Widget> rows = [];
-    for (List<String> ipPair in servers) {
+    for (Server s in servers) {
       rows.add(Row(
         children: [
           const Spacer(),
-          Expanded(flex: 7, child: Text(ipPair[0])),
+          Expanded(flex: 7, child: Text(s.address)),
           const Spacer(),
-          Expanded(flex: 2, child: Text(ipPair[1])),
+          Expanded(flex: 2, child: s.isOnline ? const Text("Online") : const Text("Offline")),
           const Spacer(),
           const Icon(
             Icons.settings,

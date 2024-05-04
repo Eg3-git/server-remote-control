@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'classes.dart';
 
 class ActionPage extends StatefulWidget {
 
@@ -13,7 +14,7 @@ class ActionPage extends StatefulWidget {
 
 class ActionState extends State<ActionPage> with SingleTickerProviderStateMixin {
 
-  List<String> actions = ["Wake", "Sleep", "Backup"];
+  List<Command> commands = [Command("Wake", Server("x")), Command("Sleep", Server("y")), Command("Backup", Server("z"))];
   int currentPageIndex = 1;
 
   void nothing() {}
@@ -28,11 +29,11 @@ class ActionState extends State<ActionPage> with SingleTickerProviderStateMixin 
 
   List<Widget> rowBuilder() {
     List<Widget> rows = [];
-    for (String action in actions) {
+    for (Command c in commands) {
       rows.add(Row(
         children: [
           const Spacer(),
-          Expanded(flex: 6, child: Text(action)),
+          Expanded(flex: 6, child: Text(c.title)),
           const Spacer(),
           Expanded(flex: 3,
               child: ElevatedButton(onPressed: nothing, child: const Text("Launch"))),

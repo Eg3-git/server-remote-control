@@ -1,4 +1,3 @@
-import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'actions.dart';
@@ -15,7 +14,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
   final List<Widget> pages = [const MyHomePage(title: "Status"), const ActionPage(title: "Actions")];
 

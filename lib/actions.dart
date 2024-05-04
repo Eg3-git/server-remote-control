@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
-import 'main.dart';
-
 class ActionPage extends StatefulWidget {
 
   const ActionPage({super.key, required this.title});

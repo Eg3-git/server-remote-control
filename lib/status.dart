@@ -13,7 +13,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  final List<Widget> pages = [const MyHomePage(title: "Status"), const ActionPage(title: "Actions")];
+  List<Widget> pages = [const MyHomePage(title: "Status"), const ActionPage(title: "Actions")];
+  final _formKey = GlobalKey<FormState>();
+  int dropdownValue = -1;
 
   List<Server> servers = [
     Server("xxx.xxx.x.xx"),
@@ -21,6 +23,66 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
 
   void nothing() {}
+
+  Future popup() {
+    return showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              Positioned(
+                right: -40,
+                top: -40,
+                child: InkResponse(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const CircleAvatar(
+                    backgroundColor: Colors.red,
+                    child: Icon(Icons.close),
+                  ),
+                ),
+              ),
+              Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: TextFormField(
+                        decoration: const InputDecoration.collapsed(hintText: "Server Address"),
+                      validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "ERROR";
+                          }
+                          return null;
+                      },
+                      onSaved: (ad) {setState(() {
+                        servers.add(Server(ad!));
+                      });},),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: ElevatedButton(
+                        child: const Text('Submitß'),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            Navigator.of(context).pop();
+                          }
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ));
+  }
 
   Widget columnBuilder() {
     return Padding(padding: const EdgeInsets.only(top: 40), child:
@@ -61,29 +123,9 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(widget.title),
         ),
         body: SingleChildScrollView(child: Center(child: columnBuilder())),
-        floatingActionButton: PopupMenuButton<String>(
-          onSelected: (String result) {
-            switch (result) {
-              case "1":
-                nothing();
-                break;
-              case "2":
-                nothing();
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
-              value: '1',
-              child: Text('Increase'),
-            ),
-            const PopupMenuItem<String>(
-              value: '2',
-              child: Text('Decrease'),
-            ),
-            // Add more PopupMenuItems for other options if needed
-          ],
-          child: const Icon(Icons.add),
+        floatingActionButton: IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: popup,
         ),
         // This trailing comma makes auto-formatting nicer for build methods.
     );

@@ -54,10 +54,10 @@ class _MyHomePageState extends State<MyHomePage> {
           onSelected: (String result) {
             switch (result) {
               case "1":
-                _incrementCounter();
+                nothing();
                 break;
               case "2":
-                _decrementCounter();
+                nothing();
                 break;
             }
           },

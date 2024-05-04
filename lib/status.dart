@@ -24,19 +24,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void nothing() {}
 
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      _counter--;
-    });
-  }
-
   Widget rowBuilder() {
     return Column(
       children: [

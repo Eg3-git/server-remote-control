@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Bottom Navigation Example',
       theme: theme(context),
-      home: BottomNavigation(),
+      home: const BottomNavigation(),
     );
   }
 }
@@ -32,8 +32,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    MyHomePage(title: 'status',),
-    ActionPage(title: 'actions'),
+    const MyHomePage(title: 'status',),
+    const ActionPage(title: 'actions'),
   ];
 
   void _onItemTapped(int index) {
@@ -47,7 +47,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -59,7 +59,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
         onTap: _onItemTapped,
       ),
     );

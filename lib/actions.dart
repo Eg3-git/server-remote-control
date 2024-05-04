@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ActionPage extends StatefulWidget {
@@ -19,18 +18,34 @@ class ActionState extends State<ActionPage> with SingleTickerProviderStateMixin 
 
   void nothing() {}
 
-  Widget rowBuilder() {
-    return Column(
-      children: [
-        for (String action in actions) Row(
-          children: [
-            Text(action),
-            ElevatedButton(onPressed: nothing, child: Text("Launch")),
-            const Icon(Icons.delete, color: Colors.white,)
-          ],
-        )
-      ],
-    );
+  Widget columnBuilder() {
+    return Padding(padding: const EdgeInsets.only(top: 40), child:
+
+    Column(
+      children: rowBuilder(),
+    ));
+  }
+
+  List<Widget> rowBuilder() {
+    List<Widget> rows = [];
+    for (String action in actions) {
+      rows.add(Row(
+        children: [
+          const Spacer(),
+          Expanded(flex: 6, child: Text(action)),
+          const Spacer(),
+          Expanded(flex: 3,
+              child: ElevatedButton(onPressed: nothing, child: const Text("Launch"))),
+          const Spacer(),
+          const Icon(Icons.settings, color: Colors.white,),
+          const Spacer()
+        ],
+
+
+      ));
+      rows.add(const SizedBox(height: 10,));
+    }
+    return rows;
   }
 
   @override
@@ -40,7 +55,7 @@ class ActionState extends State<ActionPage> with SingleTickerProviderStateMixin 
           //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
         ),
-        body: SingleChildScrollView(child: Center(child: rowBuilder())),
+        body: SingleChildScrollView(child: Center(child: columnBuilder())),
         floatingActionButton: PopupMenuButton<String>(
           onSelected: (String result) {
             switch (result) {

@@ -1,8 +1,5 @@
-
 import 'package:flutter/material.dart';
 import 'actions.dart';
-
-
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -24,22 +21,35 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void nothing() {}
 
-  Widget rowBuilder() {
-    return Column(
-      children: [
-        for (List<String> ip_pair in servers)
-          Row(
-            children: [
-              Text(ip_pair[0]),
-              Text(ip_pair[1]),
-              const Icon(
-                Icons.delete,
-                color: Colors.white,
-              )
-            ],
-          )
-      ],
-    );
+  Widget columnBuilder() {
+    return Padding(padding: const EdgeInsets.only(top: 40), child:
+
+    Column(
+    children: rowBuilder(),
+    ));
+  }
+
+  List<Widget> rowBuilder() {
+    List<Widget> rows = [];
+    for (List<String> ipPair in servers) {
+      rows.add(Row(
+        children: [
+          const Spacer(),
+          Expanded(flex: 7, child: Text(ipPair[0])),
+          const Spacer(),
+          Expanded(flex: 2, child: Text(ipPair[1])),
+          const Spacer(),
+          const Icon(
+            Icons.settings,
+            color: Colors.white,
+          ),
+          const Spacer()
+        ],
+      ));
+      rows.add(const SizedBox(height: 10));
+    }
+    return rows;
+
   }
 
   @override
@@ -49,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
           //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
         ),
-        body: SingleChildScrollView(child: Center(child: rowBuilder())),
+        body: SingleChildScrollView(child: Center(child: columnBuilder())),
         floatingActionButton: PopupMenuButton<String>(
           onSelected: (String result) {
             switch (result) {

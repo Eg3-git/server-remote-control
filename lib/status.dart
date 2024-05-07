@@ -26,7 +26,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void nothing() {}
 
-  Future popup() {
+  Future popup({bool editMode=false, Server? serverToEdit}) {
     return showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
@@ -52,21 +52,22 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    const Padding(
-                        padding: EdgeInsets.all(8),
-                    child: Text("Add a server")),
+                    Padding(
+                        padding: const EdgeInsets.all(8),
+                    child: editMode ? const Text("Edit Server") : const Text("Add a Server")),
 
                     Padding(
                       padding: const EdgeInsets.all(8),
                       child: TextFormField(
 
                         textAlignVertical: TextAlignVertical.center,
+                        initialValue: editMode ? serverToEdit?.address : "",
 
                         decoration: InputDecoration(
                           labelText: "Server Address",
-                          labelStyle: TextStyle(color: Colors.grey, backgroundColor: Colors.black),
+                          labelStyle: const TextStyle(color: Colors.grey, backgroundColor: Colors.black),
                           filled: true,
-                            fillColor: Colors.black,
+                          fillColor: Colors.black,
 
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
@@ -74,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),),
                       validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "ERROR";
+                            return "Enter server IP or URL";
                           }
                           return null;
                       },
@@ -91,10 +92,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
                         maxLength: 5,
+                        initialValue: editMode ? serverToEdit?.port : "",
 
                         decoration: InputDecoration(
                           labelText: "Port",
-                          labelStyle: TextStyle(color: Colors.grey, backgroundColor: Colors.black),
+                          labelStyle: const TextStyle(color: Colors.grey, backgroundColor: Colors.black),
                           filled: true,
                           fillColor: Colors.black,
 
@@ -120,11 +122,16 @@ class _MyHomePageState extends State<MyHomePage> {
                     Padding(
                       padding: const EdgeInsets.all(8),
                       child: ElevatedButton(
-                        child: const Text('Submitß'),
+                        child: const Text('Submit'),
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
-                            servers.add(Server(dummyData[0], dummyData[1]));
+                            if (editMode) {
+                              serverToEdit?.address = dummyData[0];
+                              serverToEdit?.port = dummyData[1];
+                            } else {
+                              servers.add(Server(dummyData[0], dummyData[1]));
+                            }
                             Navigator.of(context).pop();
                           }
                         },
@@ -156,9 +163,9 @@ class _MyHomePageState extends State<MyHomePage> {
           const Spacer(),
           Expanded(flex: 2, child: s.isOnline ? const Text("Online") : const Text("Offline")),
           const Spacer(),
-          const Icon(
-            Icons.settings,
-            color: Colors.white,
+          IconButton(
+            icon: const Icon(Icons.settings),
+            color: Colors.white, onPressed: () => popup(editMode: true, serverToEdit: s),
           ),
           const Spacer()
         ],

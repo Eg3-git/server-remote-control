@@ -15,12 +15,12 @@ class ActionPage extends StatefulWidget {
 
 class ActionState extends State<ActionPage> with SingleTickerProviderStateMixin {
 
-  List<Command> commands = [Command("Wake", Server("x")), Command("Sleep", Server("y")), Command("Backup", Server("z"))];
+  List<Command> commands = [Command("Wake", Server("x", "22")), Command("Sleep", Server("y", "80")), Command("Backup", Server("z", "443"))];
   int currentPageIndex = 1;
   final _formKey = GlobalKey<FormState>();
   List<Server> servers = [
-    Server("xxx.xxx.x.xx"),
-    Server("yyy.yyy.y.yy")
+    Server("xxx.xxx.x.xx", "80"),
+    Server("yyy.yyy.y.yy", "22")
   ];
   Server? _selectedObject;
   Server? dummyServer;

@@ -8,7 +8,8 @@ class Command {
 class Server {
   String address;
   bool isOnline = true;
+  String port;
 
-  Server(this.address);
+  Server(this.address, this.port);
 }
 

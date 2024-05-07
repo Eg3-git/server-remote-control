@@ -50,11 +50,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: 'Status',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
-            label: 'Settings',
+            label: 'Commands',
           ),
 
         ],

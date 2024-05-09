@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'commands.dart';
 import 'classes.dart';
 
@@ -18,11 +19,14 @@ class _MyHomePageState extends State<MyHomePage> {
   final _formKey = GlobalKey<FormState>();
   int dropdownValue = -1;
 
-  List<Server> servers = [
-    Server("xxx.xxx.x.xx", "22"),
-    Server("yyy.yyy.y.yy", "80")
-  ];
+  List<Server> servers = [];
   List<String> dummyData = ["", ""];
+
+  @override
+  void initState() {
+    super.initState();
+    load();
+  }
 
   void nothing() {}
 
@@ -130,8 +134,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               serverToEdit?.address = dummyData[0];
                               serverToEdit?.port = dummyData[1];
                             } else {
-                              servers.add(Server(dummyData[0], dummyData[1]));
+                              servers.add(Server(address: dummyData[0], port: dummyData[1]));
                             }
+                            save();
                             Navigator.of(context).pop();
                           }
                         },
@@ -143,6 +148,20 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ));
+  }
+
+  void save() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String encodedData = Server.encode(servers);
+    await prefs.setString('servers_key', encodedData);
+  }
+
+  void load() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? serversString = prefs.getString('servers_key');
+    setState(() {
+      servers = Server.decode(serversString!);
+    });
   }
 
   Widget columnBuilder() {

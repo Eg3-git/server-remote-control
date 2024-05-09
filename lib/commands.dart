@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'classes.dart';
 
@@ -13,20 +14,19 @@ class ActionPage extends StatefulWidget {
 
 class ActionState extends State<ActionPage>
     with SingleTickerProviderStateMixin {
-  List<Command> commands = [
-    Command("Wake", Server(address: "x", port: "22")),
-    Command("Sleep", Server(address: "y", port: "80")),
-    Command("Backup", Server(address: "z", port: "443"))
-  ];
+  List<Command> commands = [];
   int currentPageIndex = 1;
   final _formKey = GlobalKey<FormState>();
-  List<Server> servers = [
-    Server(address: "xxx.xxx.x.xx", port: "80"),
-    Server(address: "yyy.yyy.y.yy", port: "22")
-  ];
+  List<Server> servers = [];
 
-  Server? dummyServer;
+  int dummyServer = 0;
   String dummyName = "";
+
+  @override
+  void initState() {
+    super.initState();
+    load();
+  }
 
   void nothing() {}
 
@@ -83,7 +83,7 @@ class ActionState extends State<ActionPage>
                                 },
                                 onSaved: (s) {
                                   setState(() {
-                                    dummyServer = s;
+                                    dummyServer = servers.indexOf(s!);
                                   });
                                 },
                                 validator: (value) {
@@ -142,9 +142,9 @@ class ActionState extends State<ActionPage>
                                 _formKey.currentState!.save();
                                 if (editMode) {
     cmdToEdit?.title = dummyName;
-    cmdToEdit?.server = dummyServer!;
+    cmdToEdit?.serverId = dummyServer;
     } else {
-                                  commands.add(Command(dummyName, dummyServer!));
+                                  commands.add(Command(title: dummyName, serverId: dummyServer));
                                 }
 
                                 Navigator.of(context).pop();
@@ -158,6 +158,25 @@ class ActionState extends State<ActionPage>
                 ],
               ),
             ));
+  }
+
+  void save() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String encodedData = Command.encode(commands);
+    await prefs.setString('commands_key', encodedData);
+  }
+
+  void load() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? serversString = prefs.getString('servers_key');
+    setState(() {
+      servers = Server.decode(serversString!);
+    });
+
+    final String? commandsString = prefs.getString('commands_key');
+    setState(() {
+      commands = Command.decode(commandsString!, servers);
+    });
   }
 
   Widget columnBuilder() {
@@ -183,7 +202,7 @@ class ActionState extends State<ActionPage>
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.settings),
-            color: Colors.white, onPressed: () => popup(editMode: true, selectedObject: c.server, cmdToEdit: c),
+            color: Colors.white, onPressed: () => popup(editMode: true, selectedObject: servers[c.serverId], cmdToEdit: c),
           ),
           const Spacer()
         ],

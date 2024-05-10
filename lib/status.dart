@@ -154,14 +154,17 @@ class _MyHomePageState extends State<MyHomePage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String encodedData = Server.encode(servers);
     await prefs.setString('servers_key', encodedData);
+    await Server.pingAll(servers);
+    setState(() {});
   }
 
   void load() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? serversString = prefs.getString('servers_key');
-    setState(() {
-      servers = Server.decode(serversString!);
-    });
+    servers = Server.decode(serversString!);
+    await Server.pingAll(servers);
+    setState(() {});
+    //Server.pingAll(servers);
   }
 
   Widget columnBuilder() {

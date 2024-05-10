@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Command {
   String title;
@@ -28,10 +30,26 @@ class Server {
     return Server(address: jsonData['address'], port: jsonData['port']);
   }
 
+  Future<bool> pingServer() async {
+    try {
+      final response = await http.get(Uri.parse(address));
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (e) {
+      return false;
+    }
+  }
+
   static Map<String, dynamic> toMap(Server server) => {'address': server.address, 'port': server.port};
 
   static String encode(List<Server> servers) => jsonEncode(servers.map<Map<String, dynamic>>((server) => Server.toMap(server)).toList());
 
   static List<Server> decode(String servers) => (jsonDecode(servers) as List<dynamic>).map<Server>((item) => Server.fromJson(item)).toList();
+  
+  static Future<void> pingAll(List<Server> servers) async {
+    for (Server server in servers) {
+      server.isOnline = await server.pingServer();
+    }
+
+  }
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 import 'classes.dart';
 
@@ -29,6 +30,26 @@ class ActionState extends State<ActionPage>
   }
 
   void nothing() {}
+
+  Future<void> sendCommand(String scriptName) async {
+    final String apiKey = "apikey";
+    final uri = Uri(
+        scheme: "https",
+        host: "domain",
+        port: 0,
+        path: "script",
+        queryParameters: {"script": "torun"});
+
+      final response = await http.get(uri, headers: {"X-API-Key": apiKey},);
+      if (response.statusCode == 200) {
+        print("horay");
+      } else {
+        print(response.body);
+      }
+
+
+
+  }
 
   Future popup({bool editMode = false, Server? selectedObject, Command? cmdToEdit}) {
     return showDialog<void>(
@@ -198,11 +219,12 @@ class ActionState extends State<ActionPage>
           Expanded(
               flex: 3,
               child: ElevatedButton(
-                  onPressed: nothing, child: const Text("Launch"))),
+                  onPressed: () => sendCommand(c.title), child: const Text("Launch"))),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.settings),
-            color: Colors.white, onPressed: () => popup(editMode: true, selectedObject: servers[c.serverId], cmdToEdit: c),
+            //color: Colors.white, onPressed: () => popup(editMode: true, selectedObject: servers[c.serverId], cmdToEdit: c),
+            color: Colors.white, onPressed: nothing,
           ),
           const Spacer()
         ],

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import 'classes.dart';
 
 class ActionPage extends StatefulWidget {
-  const ActionPage({super.key, required this.title});
+  const ActionPage(
+      {super.key, required this.title, required this.storageHelper});
 
   final String title;
+  final StorageHelper storageHelper;
 
   @override
   ActionState createState() => ActionState();
@@ -20,7 +21,7 @@ class ActionState extends State<ActionPage>
   final _formKey = GlobalKey<FormState>();
   List<Server> servers = [];
 
-  int dummyServer = 0;
+  Server? dummyServer;
   String dummyName = "";
 
   @override
@@ -32,7 +33,7 @@ class ActionState extends State<ActionPage>
   void nothing() {}
 
   Future<void> sendCommand(String scriptName) async {
-    final String apiKey = "apikey";
+    const String apiKey = "apikey";
     final uri = Uri(
         scheme: "https",
         host: "domain",
@@ -40,18 +41,15 @@ class ActionState extends State<ActionPage>
         path: "script",
         queryParameters: {"script": "torun"});
 
-      final response = await http.get(uri, headers: {"X-API-Key": apiKey},);
-      if (response.statusCode == 200) {
-        print("horay");
-      } else {
-        print(response.body);
-      }
-
-
+    final response = await http.get(
+      uri,
+      headers: {"X-API-Key": apiKey},
+    );
 
   }
 
-  Future popup({bool editMode = false, Server? selectedObject, Command? cmdToEdit}) {
+  Future popup(
+      {bool editMode = false, Server? selectedObject, Command? cmdToEdit}) {
     return showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
@@ -104,7 +102,7 @@ class ActionState extends State<ActionPage>
                                 },
                                 onSaved: (s) {
                                   setState(() {
-                                    dummyServer = servers.indexOf(s!);
+                                    dummyServer = s!;
                                   });
                                 },
                                 validator: (value) {
@@ -119,7 +117,8 @@ class ActionState extends State<ActionPage>
                                         value: s,
                                         child: Text(
                                           s.address,
-                                          style: const TextStyle(color: Colors.white),
+                                          style: const TextStyle(
+                                              color: Colors.white),
                                         ));
                                   },
                                 ).toList()),
@@ -162,12 +161,15 @@ class ActionState extends State<ActionPage>
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
                                 if (editMode) {
-    cmdToEdit?.title = dummyName;
-    cmdToEdit?.serverId = dummyServer;
-    } else {
-                                  commands.add(Command(title: dummyName, serverId: dummyServer));
+                                  cmdToEdit?.title = dummyName;
+                                  cmdToEdit?.serverId = dummyServer!;
+                                } else {
+                                  commands.add(Command(
+                                      title: dummyName,
+                                      serverId: dummyServer!));
                                 }
 
+                                save();
                                 Navigator.of(context).pop();
                               }
                             },
@@ -182,22 +184,15 @@ class ActionState extends State<ActionPage>
   }
 
   void save() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String encodedData = Command.encode(commands);
-    await prefs.setString('commands_key', encodedData);
+    for (Command c in commands) {
+      await widget.storageHelper.insertCommand(c);
+    }
   }
 
   void load() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? serversString = prefs.getString('servers_key');
-    setState(() {
-      servers = Server.decode(serversString!);
-    });
-
-    final String? commandsString = prefs.getString('commands_key');
-    setState(() {
-      commands = Command.decode(commandsString!, servers);
-    });
+    servers = await widget.storageHelper.getServers();
+    commands = await widget.storageHelper.getCommands();
+    setState(() {});
   }
 
   Widget columnBuilder() {
@@ -219,12 +214,14 @@ class ActionState extends State<ActionPage>
           Expanded(
               flex: 3,
               child: ElevatedButton(
-                  onPressed: () => sendCommand(c.title), child: const Text("Launch"))),
+                  onPressed: () => sendCommand(c.title),
+                  child: const Text("Launch"))),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.settings),
             //color: Colors.white, onPressed: () => popup(editMode: true, selectedObject: servers[c.serverId], cmdToEdit: c),
-            color: Colors.white, onPressed: nothing,
+            color: Colors.white,
+            onPressed: nothing,
           ),
           const Spacer()
         ],

@@ -1,22 +1,20 @@
 import 'dart:async';
-import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 class Command {
   String title;
-  int serverId;
+  Server serverId;
 
   Command({required this.title, required this.serverId});
 
-  factory Command.fromJson(Map<String, dynamic> jsonData, List<Server> servers) {
-    return Command(title: jsonData['title'], serverId: int.parse(jsonData['serverId']));
+  Map<String, dynamic> toMap() {
+    return {'title': title, 'serverId': serverId.toMap()};
   }
 
-  static Map<String, dynamic> toMap(Command command) => {'title': command.title, 'serverId': command.serverId};
-
-  static String encode(List<Command> commands) => jsonEncode(commands.map<Map<String, dynamic>>((command) => Command.toMap(command)).toList());
-
-  static List<Command> decode(String commands, List<Server> servers) => (jsonDecode(commands) as List<dynamic>).map<Command>((item) => Command.fromJson(item, servers)).toList();
+  factory Command.fromMap(Map<String, dynamic> map) {
+    return Command(title: map['title'], serverId: map['serverId']);
+  }
 }
 
 class Server {
@@ -25,10 +23,6 @@ class Server {
   String port;
 
   Server({required this.address, required this.port});
-
-  factory Server.fromJson(Map<String, dynamic> jsonData) {
-    return Server(address: jsonData['address'], port: jsonData['port']);
-  }
 
   Future<bool> pingServer() async {
     try {
@@ -39,17 +33,25 @@ class Server {
     }
   }
 
-  static Map<String, dynamic> toMap(Server server) => {'address': server.address, 'port': server.port};
-
-  static String encode(List<Server> servers) => jsonEncode(servers.map<Map<String, dynamic>>((server) => Server.toMap(server)).toList());
-
-  static List<Server> decode(String servers) => (jsonDecode(servers) as List<dynamic>).map<Server>((item) => Server.fromJson(item)).toList();
-  
   static Future<void> pingAll(List<Server> servers) async {
     for (Server server in servers) {
       server.isOnline = await server.pingServer();
     }
+  }
 
+  Map<String, dynamic> toMap() => {'address': address, 'port': port};
+
+  factory Server.fromMap(Map<String, dynamic> map) {
+    return Server(address: map['address'], port: map['port']);
   }
 }
 
+abstract class StorageHelper {
+  Future<void> insertServer(Server s);
+
+  Future<void> insertCommand(Command c);
+
+  Future<List<Server>> getServers();
+
+  Future<List<Command>> getCommands();
+}

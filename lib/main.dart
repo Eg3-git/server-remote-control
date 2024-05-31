@@ -1,28 +1,51 @@
 // main.dart
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'status.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:server_remote_control/classes.dart';
+import 'package:server_remote_control/hive_helper.dart';
+import 'package:server_remote_control/sqflite_helper.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
 import 'commands.dart';
+import 'status.dart';
 import 'theme.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  StorageHelper storageHelper;
+
+  if (kIsWeb) {
+    await Hive.initFlutter();
+    storageHelper = HiveHelper();
+  } else {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+    storageHelper = SqfliteHelper();
+  }
+
+  runApp(MyApp(storageHelper: storageHelper));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final StorageHelper storageHelper;
+
+  const MyApp({super.key, required this.storageHelper});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Bottom Navigation Example',
       theme: theme(context),
-      home: const BottomNavigation(),
+      home: BottomNavigation(storageHelper: storageHelper),
     );
   }
 }
 
 class BottomNavigation extends StatefulWidget {
-  const BottomNavigation({super.key});
+  final StorageHelper storageHelper;
+
+  const BottomNavigation({super.key, required this.storageHelper});
 
   @override
   State<BottomNavigation> createState() => _BottomNavigationState();
@@ -30,11 +53,22 @@ class BottomNavigation extends StatefulWidget {
 
 class _BottomNavigationState extends State<BottomNavigation> {
   int _selectedIndex = 0;
+  late List<Widget> _pages;
 
-  final List<Widget> _pages = [
-    const MyHomePage(title: 'Server Status',),
-    const ActionPage(title: 'Commands'),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      MyHomePage(
+        title: 'Server Status',
+        storageHelper: widget.storageHelper,
+      ),
+      ActionPage(
+        title: 'Commands',
+        storageHelper: widget.storageHelper,
+      ),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -56,7 +90,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
             icon: Icon(Icons.settings),
             label: 'Commands',
           ),
-
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

@@ -5,15 +5,32 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:server_remote_control/classes.dart';
+import 'package:server_remote_control/hive_helper.dart';
 
 import 'package:server_remote_control/main.dart';
+import 'package:server_remote_control/sqflite_helper.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    WidgetsFlutterBinding.ensureInitialized();
+    StorageHelper storageHelper;
+
+    if (kIsWeb) {
+      await Hive.initFlutter();
+      storageHelper = HiveHelper();
+    } else {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+      storageHelper = SqfliteHelper();
+    }
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(MyApp(storageHelper: storageHelper,));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
